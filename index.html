@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>25w45a0134</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'San Francisco','Helvetica Neue',sans-serif; }
+  body {
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRShy3qD_PsSDGERNUhXpV-EQI5AYPuubtMLw&s') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Top bar (always visible) */
+  #topbar {
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:30px;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center;
+    padding: 0 10px;
+    z-index: 1000;
+  }
+  #topbar span { margin-right: 15px; color:#fff; font-size: 14px; }
+  #datetime { margin-left:auto; }
+
+  /* Dock (hides when window maximized) */
+  #dock {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 10px 20px;
+    gap: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+    z-index: 900;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  #dock.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 20px);
+  }
+
+  .dock-icon {
+    width: 50px; height: 50px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .dock-icon:hover { transform: scale(1.2); }
+
+  /* Window styling */
+  .window {
+    position: absolute;
+    top: 100px; left: 100px;
+    width: 400px; height: 300px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+    z-index: 10;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .window-header {
+    height: 30px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    cursor: grab;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 5000;
+  }
+
+  .window-buttons { display: flex; gap: 8px; }
+  .window-buttons div {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .window-buttons div:nth-child(1){ background:red; }
+  .window-buttons div:nth-child(2){ background:yellow; }
+  .window-buttons div:nth-child(3){ background:green; }
+  .window-buttons div:hover { transform: scale(1.15); }
+
+  .window-content {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 30px);
+    overflow: hidden;
+  }
+
+  .window-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  #text-editor textarea {
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    resize: none;
+    font-size: 16px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+  }
+</style>
+</head>
+<body>
+
+<!-- Topbar with date/time -->
+<div id="topbar">
+  <span>Coming Soon...</span>
+  <span>Version Indev 25w45a0134</span>
+  <span id="datetime"></span>
+</div>
+
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    const options = { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    };
+    document.getElementById('datetime').textContent = now.toLocaleString('en-US', options);
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
+
+<!-- Dock -->
+<div id="dock">
+  <div class="dock-icon" onclick="openWindow('text-editor')">📝</div>
+  <div class="dock-icon" onclick="openWindow('calculator')">🧮</div>
+  <div class="dock-icon" onclick="openWindow('browser')">🐦</div>
+  <div class="dock-icon" onclick="openWindow('file-explorer')">📁</div>
+  <div class="dock-icon" onclick="openWindow('minecraft')" style="font-size: 10px;">Minecraft 1.8</div>
+  <div class="dock-icon" onclick="openWindow('proxy')">🛰</div>
+  <div class="dock-icon" onclick="openWindow('info')">❔</div>
+</div>
+
+<!-- Text Editor -->
+<div class="window" id="text-editor" style="display:none;">
+  <div class="window-header">
+    <div class="window-buttons">
+      <div onclick="closeWindow('text-editor')"></div>
+      <div onclick="minimizeWindow('text-editor')"></div>
+      <div onclick="maximizeWindow('text-editor')"></div>
+    </div>
+  </div>
+  <div class="window-content">
+    <textarea placeholder="Type something..."></textarea>
+  </div>
+</div>
+
+<!-- Version Info -->
+<div class="window" id="info" style="display:none;">
+  <div class="window-header">
+    <div class="window-buttons">
+      <div onclick="closeWindow('info')"></div>
+      <div onclick="minimizeWindow('info')"></div>
+      <div onclick="maximizeWindow('info')"></div>
+    </div>
+  </div>
+  <div class="window-content">
+    <textarea placeholder="Version info: 25w45a0134. How to read: 25 is the year, w stands for week, 45 for what week of the year it is, a is a placeholder to keep it organized, 0134 for the time, being 1:34AM in the morning when making this version" readonly></textarea>
+  </div>
+</div>
+
+
+
+<!-- Falconcraft -->
+<div class="window" id="browser" style="display:none;">
+  <div class="window-header">
+    <div class="window-buttons">
+      <div onclick="closeWindow('browser')"></div>
+      <div onclick="minimizeWindow('browser')"></div>
+      <div onclick="maximizeWindow('browser')"></div>
+    </div>
+  </div>
+  <div class="window-content">
+    <iframe src="open.html"></iframe>
+  </div>
+</div>
+
+<!-- Croxy Proxy -->
+<div class="window" id="proxy" style="display:none;">
+  <div class="window-header">
+    <div class="window-buttons">
+      <div onclick="closeWindow('proxy')"></div>
+      <div onclick="minimizeWindow('proxy')"></div>
+      <div onclick="maximizeWindow('proxy')"></div>
+    </div>
+  </div>
+  <div class="window-content">
+    <iframe src="https://www.croxyproxy.com/"></iframe>
+  </div>
+</div>
+
+
+<!-- Minecraft -->
+<div class="window" id="minecraft" style="display:none;">
+  <div class="window-header">
+    <div class="window-buttons">
+      <div onclick="closeWindow('minecraft')"></div>
+      <div onclick="minimizeWindow('minecraft')"></div>
+      <div onclick="maximizeWindow('minecraft')"></div>
+    </div>
+  </div>
+  <div class="window-content">
+    <iframe src="eaglercraft.html"></iframe>
+  </div>
+</div>
+
+<script>
+  const dock = document.getElementById('dock');
+
+  function updateDockVisibility(){
+    // Check if any window is visible
+    const anyOpen = Array.from(document.querySelectorAll('.window')).some(w => w.style.display !== 'none');
+    if(anyOpen){
+      dock.classList.add('hidden');
+    } else {
+      dock.classList.remove('hidden');
+    }
+  }
+
+  function openWindow(id){
+    const w=document.getElementById(id);
+    w.style.display='flex';
+    w.style.zIndex=getTopZIndex();
+    updateDockVisibility();
+  }
+
+  function closeWindow(id){
+    const w = document.getElementById(id);
+    w.style.display='none';
+    w.dataset.maximized = 'false';
+    updateDockVisibility();
+  }
+
+  function minimizeWindow(id){
+    const w = document.getElementById(id);
+    w.style.display='none';
+    updateDockVisibility();
+  }
+
+  function maximizeWindow(id){
+    const w=document.getElementById(id);
+    const isMax = w.dataset.maximized === 'true';
+    if(!isMax){
+      w.dataset.prevTop=w.style.top;
+      w.dataset.prevLeft=w.style.left;
+      w.dataset.prevWidth=w.style.width;
+      w.dataset.prevHeight=w.style.height;
+
+      w.style.top='30px'; 
+      w.style.left='0';
+      w.style.width='100%';
+      w.style.height='calc(100% - 30px)';
+      w.dataset.maximized='true';
+      dock.classList.add('hidden');
+    } else {
+      w.style.top=w.dataset.prevTop;
+      w.style.left=w.dataset.prevLeft;
+      w.style.width=w.dataset.prevWidth;
+      w.style.height=w.dataset.prevHeight;
+      w.dataset.maximized='false';
+      updateDockVisibility();
+    }
+  }
+
+  function getTopZIndex(){
+    let max=10;
+    document.querySelectorAll('.window').forEach(w=>{
+      const z=parseInt(w.style.zIndex)||10;
+      if(z>max) max=z;
+    });
+    return max+1;
+  }
+
+  // Draggable windows
+  let dragTarget=null, offsetX=0, offsetY=0;
+  document.querySelectorAll('.window-header').forEach(header=>{
+    header.addEventListener('mousedown', (e)=>{
+      dragTarget=header.parentElement;
+      if(dragTarget.dataset.maximized==='true') return;
+      offsetX=e.clientX-dragTarget.offsetLeft;
+      offsetY=e.clientY-dragTarget.offsetTop;
+      dragTarget.style.zIndex=getTopZIndex();
+    });
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(dragTarget){
+      dragTarget.style.left=(e.clientX-offsetX)+'px';
+      dragTarget.style.top=(e.clientY-offsetY)+'px';
+    }
+  });
+  document.addEventListener('mouseup', ()=>{ dragTarget=null; });
+</script>
+
+</body>
+</html>
